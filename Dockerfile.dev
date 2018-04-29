@@ -1,0 +1,40 @@
+# This is the dockerfile to build a dev environment, include the tools you want in here that would normally not be in a production build
+FROM ubuntu:17.10
+
+# Installing required packages
+RUN DEBIAN_FRONTEND=noninteractive apt-get update
+
+# Install required packages
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
+    perl \
+    libhtml-treebuilder-xpath-perl \
+    curl \
+    python \
+    less \
+    ngrep \
+    tcpdump \
+    vim \
+    emacs \
+    python-mode \
+    lua-mode \
+    make \
+    net-tools \
+    mysql-server \
+    mysql-client \
+    mysql-common \
+    libclass-dbi-mysql-perl \
+    gcc
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y cpanminus
+
+RUN DEBIAN_FRONTEND=noninteractive cpanm install --installdeps HTML::TableContent
+RUN DEBIAN_FRONTEND=noninteractive cpanm install --installdeps HTML::TableExtract
+RUN DEBIAN_FRONTEND=noninteractive cpanm install --installdeps PAR
+RUN DEBIAN_FRONTEND=noninteractive cpanm install --installdeps PAR::Dist
+RUN DEBIAN_FRONTEND=noninteractive cpanm install --installdeps PAR::Packer
+RUN DEBIAN_FRONTEND=noninteractive cpanm install --installdeps pp
+
+WORKDIR /app
+
+
+
