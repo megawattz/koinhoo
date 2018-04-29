@@ -1,7 +1,7 @@
 # I made some changes to support multiple environments. Basically, each environment is defined by a Dockefile.<environment> or what I called ROLE
 # So when you to make, you say make ROLE=name drun, or make ROLE=name dbuild or whatever.
 # If you don't define a ROLE, there is a default, so what you are used to, no ROLE, will still work.
-PRODUCT=coinpredict
+PRODUCT=koinhoo
 ROLE_DEFAULT=dev
 ROLE := $(ROLE_DEFAULT)
 IMAGE_NAME = $(PRODUCT)_$(ROLE)
