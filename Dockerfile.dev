@@ -27,11 +27,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y cpanminus
 
-RUN DEBIAN_FRONTEND=noninteractive cpanm install --installdeps HTML::TableContent
-RUN DEBIAN_FRONTEND=noninteractive cpanm install --installdeps HTML::TableExtract
-RUN DEBIAN_FRONTEND=noninteractive cpanm install --installdeps PAR
-RUN DEBIAN_FRONTEND=noninteractive cpanm install --installdeps PAR::Dist
-RUN DEBIAN_FRONTEND=noninteractive cpanm install --installdeps PAR::Packer
+RUN DEBIAN_FRONTEND=noninteractive cpan install HTML::TableContent
+RUN DEBIAN_FRONTEND=noninteractive cpan install HTML::TableExtract
+RUN DEBIAN_FRONTEND=noninteractive cpan install PAR
+RUN DEBIAN_FRONTEND=noninteractive cpan install PAR::Dist
+RUN DEBIAN_FRONTEND=noninteractive cpan install JSON
 RUN DEBIAN_FRONTEND=noninteractive cpanm install --installdeps pp
 
 WORKDIR /app
