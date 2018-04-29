@@ -16,7 +16,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
     vim \
     emacs \
     python-mode \
-    lua-mode \
     make \
     net-tools \
     mysql-server \
@@ -25,14 +24,24 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
     libclass-dbi-mysql-perl \
     gcc
 
+# Perl junk
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y cpanminus
 
-RUN DEBIAN_FRONTEND=noninteractive cpan install HTML::TableContent
-RUN DEBIAN_FRONTEND=noninteractive cpan install HTML::TableExtract
-RUN DEBIAN_FRONTEND=noninteractive cpan install PAR
-RUN DEBIAN_FRONTEND=noninteractive cpan install PAR::Dist
-RUN DEBIAN_FRONTEND=noninteractive cpan install JSON
-RUN DEBIAN_FRONTEND=noninteractive cpanm install --installdeps pp
+RUN  cpan install HTML::TableContent
+RUN  cpan install HTML::TableExtract
+RUN  cpan install PAR
+RUN  cpan install PAR::Dist
+RUN  cpan install JSON
+RUN  cpanm install --installdeps pp
+
+# Python modules
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install -y python-pip
+RUN easy_install pip
+RUN easy_install requests
+
+# command line json parser, useful for pretty printing JSON output from curl, i.e. curl "http://blahblach" | jq
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y jq
 
 WORKDIR /app
 

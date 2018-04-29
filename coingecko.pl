@@ -4,16 +4,8 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-#use IO::File;
-#use POSIX;
 use IO::Socket;
-#use Cwd;
 use JSON;
-#use FindBin;
-#use Carp;
-#use Digest::SHA qw(hmac_sha256_hex hmac_sha512_hex);
-#use WWW::Curl::Easy;
-#use File::Slurp;
 use HTML::TableExtract;
 use LWP;
 
@@ -62,11 +54,7 @@ foreach my $arg (@ARGV) {
   $Config->{Options}->{$key} = $value;
 }
 
-Output(3, Dumper($Config));
-
 my $Url = $Config->{Options}->{url};
-
-Output(4, sprintf("Request:%s\n", $Url));
 
 my $Browser = LWP::UserAgent->new;
 $Browser->cookie_jar({});
@@ -76,24 +64,17 @@ my $Request = HTTP::Request->new(GET => $Url);
 
 my $Response = $Browser->request($Request);
 
-Output(4, "Raw Response:\n", Dumper($Response));
 my $Columns = ['COIN','PRICE','24H','7D','30D','MKT CAP','LIQUIDITY','DEVELOPER','COMMUNITY','PUBLIC INTEREST','TOTAL'];  # only extract columns with these names (in the table header)
 
 my $Extractor = HTML::TableExtract->new(headers => $Columns);
-
-Output(5, "Extractor:".Dumper($Extractor));
 
 $Extractor->parse($Response->content);
 
 my @Tables = $Extractor->tables;
 
-Output(4, "Tables:".Dumper(@Tables));
-
 my $TableIndex = $Config->{Options}->{table_index};
 
 my $Table = $Tables[$TableIndex];
-
-Output(3, "Table:".Dumper($Table));
 
 my $index = 0;
 
@@ -117,8 +98,7 @@ if ($Config->{Options}->{format} eq "flat")
 	};
     }
 }
-
-if ($Config->{Options}->{format} eq "json") 
+elsif ($Config->{Options}->{format} eq "json") 
 {
     my $Tree = {};
     my @Fields = ('Price', 'Change24h', 'Change7d', 'Change30d',
@@ -144,6 +124,10 @@ if ($Config->{Options}->{format} eq "json")
     }
 
    print to_json($Tree, {pretty => 1});
+} 
+else
+{
+    die("Invalid --format= specified (must be json or flat)");
 }
 
 # Main code ends here
@@ -157,10 +141,8 @@ __DATA__
 	verbosity => 2,
 	delimiter => " ",
 	filter => undef,
-    format => 'json', # or "flat"
-    schema => 0,
-	primary => 2,       # which column will contain the primary key
-	version => "cgo.pl version_info: 1.0.0-75-g3373969 3373969 master 04/13/18-13:38:23",
+	format => 'json', # or "flat"
+	version => "coingecko.pl version_info: 1.0.0 be80504 perl-docker-additions 04/29/18-18:48:36",
 	end => 0
     }
 }

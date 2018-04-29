@@ -121,7 +121,7 @@ __DATA__
 	sort => 2,
         format => "json", # or "flat"
 	filter => 'sub {return $_[4] > 1000000 && $_[1] > 10000000; }',
-	version => "coinmarketcap.pl version_info: 1.0.0-75-g3373969 3373969 master 04/13/18-13:38:23",
+	version => "coinmarketcap.pl version_info: 1.0.0 be80504 perl-docker-additions 04/29/18-18:48:36",
 	end => 0
     }
 }
