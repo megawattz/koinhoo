@@ -7,6 +7,7 @@ use Data::Dumper;
 use IO::Socket;
 use HTML::TableExtract;
 use LWP::Simple;
+use JSON;
 
 $| = 1; # immediately flush output
 $Data::Dumper::Indent = 1;
@@ -66,26 +67,51 @@ sub Main {
 
     # not configurable because they are dependent on the website
     my @Fields = qw/Symbol MarketCap Price Supply Volume Change1h Change24h Change7d/;
-    print sprintf("%-8s %15s %12s %20s %15s %10s %10s %10s\n", qw/Symbol MarketCap Price Supply Volume Change1h Change24h Change7d/);
 
-    # make an internal map/hash of the values so we can do sort and filtering operations
-    my @Dbase = map {FixUp($_, qr/[\s,\$%\*]/)} $Table->rows;
+    if ($Config->{Options}->{format} eq "flat") 
+    {
+	print sprintf("%-8s %15s %12s %20s %15s %10s %10s %10s\n", qw/Symbol MarketCap Price Supply Volume Change1h Change24h Change7d/);
+	
+	# make an internal map/hash of the values so we can do sort and filtering operations
+	my @Dbase = map {FixUp($_, qr/[\s,\$%\*]/)} $Table->rows;
+	
+	my $SortField = $Config->{Options}->{sort};
+	my @Sorted = sort {$b->[$SortField] <=> $a->[$SortField]} @Dbase;
+	
+	# print rows
+	foreach my $row (@Sorted) {
+	    my $c = FixUp($row, qr/[\s,\$%\*]/);
+	    my $filter = eval $Config->{Options}->{filter};
+	    next unless &$filter(@$c);
+	    my $line = sprintf("%-8s %15s %12s %20s %15s %10s %10s %10s\n", Commaize(@$c));
+	    print $line;
+	}
+    }
 
-    my $SortField = $Config->{Options}->{sort};
-    my @Sorted = sort {$b->[$SortField] <=> $a->[$SortField]} @Dbase;
-    
-    # print rows
-    foreach my $row (@Sorted) {
-	my $c = FixUp($row, qr/[\s,\$%\*]/);
-	my $filter = eval $Config->{Options}->{filter};
-	next unless &$filter(@$c);
-	my $line = sprintf("%-8s %15s %12s %20s %15s %10s %10s %10s\n", Commaize(@$c));
-	print $line;
+    if ($Config->{Options}->{format} eq "json") 
+    {
+	my $Tree = {};
+	
+	foreach my $row ($Table->rows) {
+	    $row = FixUp($row, qr/[\s,\$%\*]/);
+	    
+	    my $attributes = {};
+	    my $index = 0;
+	    
+	    foreach my $field (@Fields) {
+		$attributes->{$field} = $row->[$index++];
+	    }
+	    
+	    $Tree->{$row->[0]} = $attributes;
+	}
+	
+	print to_json($Tree, {pretty => 1});
+	
     }
 }
 
 Main();
-
+    
 __DATA__
 {
     Options => {
@@ -93,6 +119,7 @@ __DATA__
 	table_index => 0,
 	exchange => 'coinmarketcap',
 	sort => 2,
+        format => "json", # or "flat"
 	filter => 'sub {return $_[4] > 1000000 && $_[1] > 10000000; }',
 	version => "coinmarketcap.pl version_info: 1.0.0-75-g3373969 3373969 master 04/13/18-13:38:23",
 	end => 0
